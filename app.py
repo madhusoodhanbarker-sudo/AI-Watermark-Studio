@@ -1,237 +1,112 @@
 import streamlit as st
 
-from modules.image_watermark import image_watermark_ui
-from modules.video_watermark import video_watermark_ui
-from modules.pdf_watermark import pdf_watermark_ui
-from modules.word_watermark import word_watermark_ui
-
+# -------------------------------
+# Page Configuration
+# -------------------------------
 st.set_page_config(
     page_title="AI Watermark Studio",
     page_icon="💧",
     layout="wide"
 )
 
-# -----------------------------
-# Custom CSS
-# -----------------------------
-st.markdown("""
-<style>
-.main-title{
-    text-align:center;
-    font-size:38px;
-    font-weight:bold;
-    color:#0E76FD;
-}
-.sub-title{
-    text-align:center;
-    color:gray;
-    margin-bottom:20px;
-}
-.stButton>button{
-    width:100%;
-}
-</style>
-""", unsafe_allow_html=True)
+# -------------------------------
+# Title
+# -------------------------------
+st.title("💧 AI Watermark Studio")
+st.write("Add Text or Logo Watermarks to Images, Videos, PDFs and Word Documents.")
 
-# -----------------------------
-# Header
-# -----------------------------
-st.markdown('<p class="main-title">💧 AI Watermark Studio</p>',
-            unsafe_allow_html=True)
-
-st.markdown(
-    '<p class="sub-title">Add Text & Logo Watermarks to Images, Videos, PDF and Word Documents</p>',
-    unsafe_allow_html=True,
-)
-
-# -----------------------------
+# -------------------------------
 # Sidebar
-# -----------------------------
-st.sidebar.title("⚙️ Navigation")
+# -------------------------------
+st.sidebar.header("Watermark Settings")
 
-page = st.sidebar.radio(
-    "Choose Module",
-    [
-        "🏠 Home",
-        "🖼 Image Watermark",
-        "🎥 Video Watermark",
-        "📄 PDF Watermark",
-        "📝 Word Watermark",
-        "ℹ️ About",
-    ],
+watermark_type = st.sidebar.radio(
+    "Watermark Type",
+    ["Text", "Logo"]
 )
 
-# -----------------------------
-# Home
-# -----------------------------
-if page == "🏠 Home":
+# -------------------------------
+# File Upload
+# -------------------------------
+uploaded_file = st.file_uploader(
+    "Upload a File",
+    type=[
+        "png", "jpg", "jpeg", "webp",
+        "mp4", "avi", "mov", "mkv", "webm",
+        "pdf",
+        "docx"
+    ]
+)
 
-    st.header("Welcome")
+# -------------------------------
+# Text Watermark
+# -------------------------------
+if watermark_type == "Text":
+    watermark_text = st.sidebar.text_input(
+        "Watermark Text",
+        "CONFIDENTIAL"
+    )
 
-    st.write("""
-AI Watermark Studio is an all-in-one Streamlit application for adding
-professional watermarks to multiple file formats.
+# -------------------------------
+# Logo Watermark
+# -------------------------------
+else:
+    logo = st.sidebar.file_uploader(
+        "Upload Logo",
+        type=["png", "jpg", "jpeg"]
+    )
 
-### Supported Files
+# -------------------------------
+# Watermark Options
+# -------------------------------
+opacity = st.sidebar.slider(
+    "Opacity",
+    0,
+    100,
+    50
+)
 
-- PNG
-- JPG
-- JPEG
-- WEBP
+rotation = st.sidebar.slider(
+    "Rotation",
+    0,
+    360,
+    45
+)
 
-- MP4
-- AVI
-- MOV
-- MKV
-- WEBM
+position = st.sidebar.selectbox(
+    "Position",
+    [
+        "Center",
+        "Top Left",
+        "Top Right",
+        "Bottom Left",
+        "Bottom Right"
+    ]
+)
 
-- PDF
+# -------------------------------
+# Display Uploaded File
+# -------------------------------
+if uploaded_file is not None:
 
-- DOCX
+    st.success("File uploaded successfully!")
 
----
+    extension = uploaded_file.name.split(".")[-1].lower()
 
-### Features
+    if extension in ["png", "jpg", "jpeg", "webp"]:
+        st.image(uploaded_file, caption="Uploaded Image")
 
-✅ Text Watermark
+    elif extension in ["mp4", "avi", "mov", "mkv", "webm"]:
+        st.video(uploaded_file)
 
-✅ Logo Watermark
+    elif extension == "pdf":
+        st.info("PDF uploaded successfully.")
 
-✅ Adjustable Opacity
+    elif extension == "docx":
+        st.info("Word document uploaded successfully.")
 
-✅ Rotation
-
-✅ Scaling
-
-✅ Position Selection
-
-✅ Batch Processing
-
-✅ Download Processed Files
-""")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.info("🖼 Image Watermark")
-
-        st.write("""
-- Text
-- Logo
-- Transparency
-- Rotation
-- Tiling
-- Font Size
-- Color
-""")
-
-    with col2:
-        st.info("🎥 Video Watermark")
-
-        st.write("""
-- Text
-- Logo
-- FFmpeg
-- OpenCV
-- Preview
-- Download
-""")
-
-    col3, col4 = st.columns(2)
-
-    with col3:
-        st.info("📄 PDF Watermark")
-
-        st.write("""
-- Text
-- Logo
-- Entire PDF
-- Selected Pages
-- Diagonal Watermark
-""")
-
-    with col4:
-        st.info("📝 Word Watermark")
-
-        st.write("""
-- Header Watermark
-- Logo
-- Draft
-- Confidential
-- Save DOCX
-""")
-
-# -----------------------------
-# Image Module
-# -----------------------------
-elif page == "🖼 Image Watermark":
-    image_watermark_ui()
-
-# -----------------------------
-# Video Module
-# -----------------------------
-elif page == "🎥 Video Watermark":
-    video_watermark_ui()
-
-# -----------------------------
-# PDF Module
-# -----------------------------
-elif page == "📄 PDF Watermark":
-    pdf_watermark_ui()
-
-# -----------------------------
-# Word Module
-# -----------------------------
-elif page == "📝 Word Watermark":
-    word_watermark_ui()
-
-# -----------------------------
-# About
-# -----------------------------
-elif page == "ℹ️ About":
-
-    st.header("About AI Watermark Studio")
-
-    st.write("""
-### Built With
-
-- Streamlit
-- Pillow
-- OpenCV
-- MoviePy
-- FFmpeg
-- PyMuPDF
-- python-docx
-- ReportLab
-- NumPy
-
----
-
-### Project Features
-
-✔ Image Watermark
-
-✔ Video Watermark
-
-✔ PDF Watermark
-
-✔ Word Watermark
-
-✔ Batch Processing
-
-✔ Text & Logo Watermarks
-
-✔ Custom Fonts
-
-✔ Adjustable Opacity
-
-✔ Rotation
-
-✔ Position Selection
-
-✔ Download Processed Files
-
----
-
-Made with ❤️ using Python and Streamlit.
-""")
+# -------------------------------
+# Process Button
+# -------------------------------
+if st.button("Apply Watermark"):
+    st.success("Watermark processing will start here.")
